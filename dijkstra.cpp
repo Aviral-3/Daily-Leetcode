@@ -1,64 +1,71 @@
-#include<bits/stdc++.h>
+#include <iostream>
+#include<vector>
 using namespace std;
-
-vector<int> dijkstra(vector<vector<int> >& adj,map<pair<int,int>,int>& C,int& source,int& n,int& m){
-         const int inf = INT_MAX;
-         //using min heap to obtain next lesser edge
-         priority_queue<pair<int,int>,vector<pair<int,int> >,greater<pair<int,int> > >q;
-
-         //Initializing distance to infinity
-         vector<int>dist(n+1,inf);
-         q.push({0,source});
-         vector<bool>visited(n+1,false);
-         dist[source]=0;
-
-         
-         while(!q.empty()){
-            auto z=q.top();
-            q.pop();
-            int y=z.first;
-            int x=z.second;
-            if(visited[x])continue;
-            visited[x]=true;
-            for(int i : adj[x]){
-              if(!visited[i]){
-              if(dist[i]>y+C[{x,i}]){
-                dist[i]=y+C[{x,i}];
-                q.push({dist[i],i});
-              }
-            }
-            }
-         }
-         return dist;
+#define MAX 9999
+int print(int graph[50][50], int z) {
+	for (int i = 0; i <= z; i++) {
+		for (int j = 0; j <= z; j++) {
+			cout << graph[i][j] << " ";
+		}
+		cout << "\n";
+	}
+	return 0;
 }
+int minVertex(vector<int>& dist, vector<bool>& mst, int n) {
+	int mini = MAX;
+	int v;
+	for (int i = 0; i < n; i++) {
+		if (mst[i] == false && dist[i] < mini) {
+			v = i;
+			mini = dist[i];
+		}
+	}
+	return v;
+}
+int Dijktras(int graph[50][50], int n,int src) {
+	vector<int>dist(n + 1, MAX);
+	vector<bool>setmst(n + 1, false);
+	vector<int>parent(n + 1);
+	parent[src] = -1;
+	dist[src] = 0;
+	for (int i = 0; i <= n - 1; i++) {
+		int m = minVertex(dist, setmst, n);
+		setmst[m] = true;
+		for (int j = 0; j <= n; j++) {
+			if (setmst[j] == false && graph[m][j] != 0 && (dist[m]+graph[m][j]) < dist[j] && dist[m]!=MAX) {
+				dist[j] = graph[m][j]+dist[m];
+				parent[j] = m;
+			}
 
-int main(){
-         int n,m;
-         cin>>n>>m;
-         //Adjacency List to store the graph
-         vector<vector<int> >adj(n+1);
-
-         //Map to store the edge lengths
-         map<pair<int,int>,int>C;
-         for(int i=0;i<m;i++){
-          int x,y,cost;
-          cin>>x>>y>>cost;
-          if(x==y)continue;
-          if(C.find({x,y})==C.end()){
-            adj[x].push_back(y);
-            C[{x,y}]=cost;
-          }
-          else{
-            C[{x,y}]=min(C[{x,y}],cost);
-          }
-         }
-         
-         int source;
-         cin>>source;
-
-         vector<int>dist = dijkstra(adj,C,source,n,m);
-
-         //Printing distance of all points from source
-         for(int i=1;i<=n;i++)cout<<dist[i]<<" ";
-          cout<<endl;
+		}
+	}
+	cout << "\nShortest pair from node: "<<src<<"\n\n";
+	for (int i = 0; i <= n; i++) {
+		if(parent[i]!=-1)
+		cout << parent[i] << " -> " << i << " = " << graph[parent[i]][i] << "\n";
+	}
+	return 0;
+}
+int main()
+{
+	int graph[50][50], n, x, y, z = 0, u = 0, w, v = 0,src;
+	memset(graph, 0, sizeof(graph));
+	cout << "Enter number of paths: ";
+	cin >> n;
+	for (int i = 0; i < n; i++) {
+		cout << "Path , destination and weigth: ";
+		cin >> x >> y >> w;
+		graph[x][y] = w;
+		graph[y][x] = w;
+		z = max(z, x);
+		u = max(u, y);
+		v++;
+	}
+	cout << "Enter Source node: ";
+	cin >> src;
+	z = max(z, u);
+	cout << "Adjacency matrix:\n\n";
+	print(graph, z);
+	Dijktras(graph, z,src);
+	return 0;
 }
